@@ -1,12 +1,37 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Hash, MessageCircle, Zap, Clock, TrendingUp, Instagram } from "lucide-react";
 import { useAutomation } from "@/hooks/useAutomation";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 export default function Dashboard() {
-  const { stats, keywords } = useAutomation();
+  const { stats, keywords, isLoading } = useAutomation();
+
+  if (isLoading) {
+    return (
+      <div className="p-6 lg:p-8 space-y-8">
+        <div>
+          <Skeleton className="h-9 w-48" />
+          <Skeleton className="h-4 w-96 mt-2" />
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="border-border bg-card">
+              <CardHeader className="pb-2">
+                <Skeleton className="h-4 w-24" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-8 w-16" />
+                <Skeleton className="h-3 w-32 mt-2" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 lg:p-8 space-y-8">

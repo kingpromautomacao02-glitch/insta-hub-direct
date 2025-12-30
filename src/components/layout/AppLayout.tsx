@@ -9,8 +9,21 @@ import {
   X,
   Zap,
   Instagram,
+  User,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -25,6 +38,17 @@ const navigation = [
 export function AppLayout({ children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success('Logout realizado com sucesso!');
+  };
+
+  const getUserInitials = () => {
+    if (!user?.email) return 'U';
+    return user.email.charAt(0).toUpperCase();
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -89,17 +113,39 @@ export function AppLayout({ children }: AppLayoutProps) {
           </nav>
 
           {/* Footer */}
-          <div className="border-t border-border p-4">
-            <div className="flex items-center gap-3 rounded-lg bg-accent/50 px-4 py-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                <Zap className="h-4 w-4 text-primary" />
-              </div>
-              <div className="flex-1">
-                <p className="text-xs font-medium text-foreground">Conectado ao n8n</p>
-                <p className="text-xs text-muted-foreground">Workflow ativo</p>
-              </div>
-              <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-            </div>
+          <div className="border-t border-border p-4 space-y-3">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left hover:bg-accent transition-colors">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="bg-primary text-primary-foreground text-sm">
+                      {getUserInitials()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">
+                      {user?.email}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Minha conta</p>
+                  </div>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <NavLink to="/perfil" onClick={() => setSidebarOpen(false)}>
+                    <User className="mr-2 h-4 w-4" />
+                    Perfil
+                  </NavLink>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer text-destructive" onClick={handleSignOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sair
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </aside>
